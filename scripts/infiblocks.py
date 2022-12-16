@@ -36,7 +36,7 @@ def apply_script(protocol, connection, config):
             ammo = weapon.current_ammo
             reserve = weapon.current_stock
             self.refill()
-            self.set_hp(health, type=FALL_KILL)
+            self.set_hp(health, kill_type=FALL_KILL)
             weapon.set_shoot(False)
             weapon.current_stock = reserve
             weapon.current_ammo = ammo
