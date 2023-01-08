@@ -12,7 +12,7 @@ import re
 I_SIMILARITY_PATTERN = re.compile(r'[il!1|]', re.I)
 AE_PATTERN = re.compile(r'[ae]', re.I)
 SPACE_PATTERN = re.compile(r'\s+')
-
+#TEST
 
 def tell_irc_about_it(self, name, other_name, originalname):
     irc_relay = self.irc_relay
