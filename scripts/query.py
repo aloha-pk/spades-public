@@ -12,6 +12,7 @@ The protocol used is the warsow version of the quake query protocol.
 """
 
 from re import sub
+from typing import List
 
 STATUS_REQUEST = '\xff\xff\xff\xffgetstatus'
 STATUS_REPLY = '\xff\xff\xff\xffstatusResponse'
@@ -36,7 +37,7 @@ def get_team_id(id_: int) -> int:  # warsow: spec = 0, no team = 1, alpha = 2, b
 
 def apply_script(protocol, connection, config):
     class QueryProtocol(protocol):
-        def handle_query(self, challenge) -> [dict, list]:
+        def handle_query(self, challenge) -> List[dict, list]:
             options = {'gamename': 'Ace of Spades', 'fs_game': 'pysnip'}
             chall = make_valid(challenge)
             if len(chall) > 0:
