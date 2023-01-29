@@ -23,14 +23,16 @@ ARAB_COUNTRIES = ('il', 'dz', 'ma', 'af', 'eg', 'bh', 'iq', 'sa', 'lb')
 
 
 @command()
-def native(connection, *args):
-    if not args:
-        if connection not in connection.protocol.players:
-            raise ValueError()
+def native(connection, user=None):
+    protocol = connection.protocol
+    if user is not None:
+        connection = get_player(protocol, user)
+    if connection not in protocol.players.values():
+        raise ValueError()
+    if not user:    
         return f"We believe you speak {connection.language}!"
     else:
-        him = get_player(connection.protocol, ' '.join(args))
-        return f"We believe {him.name} speaks {him.language}!"
+        return f"We believe {connection.name} speaks {connection.language}!"
 
 
 def apply_script(protocol, connection, config):
