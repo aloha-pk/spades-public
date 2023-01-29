@@ -24,7 +24,7 @@ def tell_irc_about_it(self, name, other_name, originalname):
     irc_relay.send(msg)
 
 
-def check_impersonations(players, name) -> [float, str]:  # probability, impersonated name
+def check_impersonations(players, name):  # probability, impersonated name
     joining_name = I_SIMILARITY_PATTERN.sub('%', name.lower())
     joining_name = AE_PATTERN.sub('!', joining_name)
     joining_name = SPACE_PATTERN.sub('', joining_name)
