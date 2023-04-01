@@ -48,6 +48,7 @@ def apply_script(protocol, connection, config):
             weapon_reload.clip_ammo = weapon.current_ammo
             weapon_reload.reserve_ammo = weapon.current_stock
             self.send_contained(weapon_reload)
+
         def on_block_build(self, x, y, z):
             if INFINITE_BLOCKS and self.blocks <= 5:
                 self.infiblocks_refill()
@@ -57,6 +58,7 @@ def apply_script(protocol, connection, config):
             if INFINITE_BLOCKS and self.blocks <= 25:
                 self.infiblocks_refill()
             return connection.on_line_build(self, points)
+
         def on_tool_set_attempt(self, tool):
             if tool == GRENADE_TOOL and self.grenades <= 0:
                 set_tool.player_id = self.player_id
