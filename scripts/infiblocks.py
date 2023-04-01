@@ -3,9 +3,10 @@
 # This file is a redistribution by the aloha.pk organization. More information: https://aloha.pk/pub/github-org
 
 
-from pyspades.contained import WeaponReload
+from pyspades.contained import WeaponReload, SetTool
 from piqueserver.commands import command
-from pyspades.constants import FALL_KILL
+from pyspades.constants import FALL_KILL, GRENADE_TOOL
+set_tool = SetTool()
 
 COMMAND_IS_LOUD = False
 INFINITE_BLOCKS = True
@@ -35,8 +36,10 @@ def apply_script(protocol, connection, config):
             weapon = self.weapon_object
             ammo = weapon.current_ammo
             reserve = weapon.current_stock
+            grenades = self.grenades
             self.refill()
             self.set_hp(health, kill_type=FALL_KILL)
+            self.grenades = grenades
             weapon.set_shoot(False)
             weapon.current_stock = reserve
             weapon.current_ammo = ammo
@@ -45,7 +48,6 @@ def apply_script(protocol, connection, config):
             weapon_reload.clip_ammo = weapon.current_ammo
             weapon_reload.reserve_ammo = weapon.current_stock
             self.send_contained(weapon_reload)
-
         def on_block_build(self, x, y, z):
             if INFINITE_BLOCKS and self.blocks <= 5:
                 self.infiblocks_refill()
@@ -55,5 +57,15 @@ def apply_script(protocol, connection, config):
             if INFINITE_BLOCKS and self.blocks <= 25:
                 self.infiblocks_refill()
             return connection.on_line_build(self, points)
+        def on_tool_set_attempt(self, tool):
+            if tool == GRENADE_TOOL and self.grenades <= 0:
+                set_tool.player_id = self.player_id
+                set_tool.value = self.tool
+                self.send_contained(set_tool)
+                if self.client_info:
+                    if self.client_info["client"] == "OpenSpades":
+                        self.send_chat_error("Out of Grenades")
+                return False
+            return connection.on_tool_set_attempt(self, tool)
 
     return protocol, InfiBlocksConnection
