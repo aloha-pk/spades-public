@@ -48,22 +48,22 @@ S_NOT_YET = "You can't start a votekick yet!"
 S_NOT_YET_ANOTHER = "You can't start another votekick yet!"
 S_NEED_REASON = 'You must provide a reason for the votekick'
 S_CANT_CANCEL = "You didn't start the votekick!"
-S_YES = '{player} voted YES'
-S_ENDED = 'Votekick for {victim} has ended. {result}'
+S_YES = u'{player} voted YES'
+S_ENDED = u'Votekick for {victim} has ended. {result}'
 S_RESULT_TIMED_OUT = 'Votekick timed out'
 S_RESULT_CANCELLED = 'Cancelled'
 S_RESULT_BANNED = 'Banned by admin'
 S_RESULT_KICKED = 'Kicked by admin'
 S_RESULT_INSTIGATOR_KICKED = 'Instigator kicked by admin'
-S_RESULT_LEFT = '{victim} left during votekick'
-S_RESULT_INSTIGATOR_LEFT = 'Instigator {instigator} left'
+S_RESULT_LEFT = u'{victim} left during votekick'
+S_RESULT_INSTIGATOR_LEFT = u'Instigator {instigator} left'
 S_RESULT_PASSED = 'Player kicked'
 S_ANNOUNCE_IRC = u'* {instigator} started a votekick against player {victim}. ' \
     u'Reason: {reason}' #note the u'' - unicode fmt strings are important when there is player input, otherwise ''.format() crashes
-S_ANNOUNCE = '{instigator} started a VOTEKICK against {victim}. Say /Y to agree'
-S_ANNOUNCE_SELF = 'You started a votekick against {victim}. Say /CANCEL to ' \
+S_ANNOUNCE = u'{instigator} started a VOTEKICK against {victim}. Say /Y to agree'
+S_ANNOUNCE_SELF = u'You started a votekick against {victim}. Say /CANCEL to ' \
     'stop it'
-S_UPDATE = '{instigator} is votekicking {victim}. /Y to vote ({needed} left)'
+S_UPDATE = u'{instigator} is votekicking {victim}. /Y to vote ({needed} left)'
 S_REASON = u'Reason: {reason}' #note the u''
 
 class VotekickFailure(Exception):
