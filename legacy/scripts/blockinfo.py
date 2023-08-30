@@ -202,7 +202,7 @@ def apply_script(protocol, connection, config):
 		def on_votekick_start(self, instigator, victim, reason):
 			result = protocol.on_votekick_start(self, instigator, victim, reason)
 			if result is None and GRIEFCHECK_ON_VOTEKICK:
-				message = grief_check(instigator, victim.name)
+				message = grief_check(instigator, "#%i" % victim.player_id)
 				if IRC_ONLY:
 					self.irc_say('* ' + message)
 				else:
