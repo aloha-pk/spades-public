@@ -33,78 +33,82 @@ from pyspades import world
 from piqueserver.scheduler import Scheduler
 from ipaddress import ip_address
 
+def is_staff(connection):
+    return any(x in connection.user_types for x in ['admin', 'moderator', 'guard'])
 
-@command('pubovl', 'ovl', admin_only=True)
+@command('pubovl', 'ovl')
 @target_player
 def pubovl(connection, player):
-	protocol = connection.protocol
-	player.hidden = not player.hidden
+	if is_staff(connection):
+		protocol = connection.protocol
+		player.hidden = not player.hidden
 
-	x, y, z = player.world_object.position.get()
+		x, y, z = player.world_object.position.get()
 
-	# full compatibility
-	create_player = loaders.CreatePlayer()
-	create_player.player_id = player.player_id
-	create_player.name = player.name
-	create_player.x = x
-	create_player.y = y
-	create_player.z = z + 2
-	create_player.weapon = player.weapon
+		# full compatibility
+		create_player = loaders.CreatePlayer()
+		create_player.player_id = player.player_id
+		create_player.name = player.name
+		create_player.x = x
+		create_player.y = y
+		create_player.z = z + 2
+		create_player.weapon = player.weapon
 
-	if player.hidden:
-		create_player.team = -1
-
-		player.send_contained(create_player)
-		
-		client = player.client_string.lower()
-		if not "voxlap" in client: # fake deuce does not work in voxlap ;-;
-			player.spawn_deuce()
-			
-		player.send_chat("You are now using pubovl")
-		protocol.irc_say('* %s is using pubovl' % player.name) # let the rest of the staff know you are using this
-	else:
-		create_player.team = player.team.id
-
-		set_color = loaders.SetColor()
-		set_color.player_id = player.player_id
-		set_color.value = make_color(*player.color)
-		
-		player.send_contained(create_player, player)
-		
-		if player.deuce_spawned:
-			player.delete_deuce()
-		
-		if player.world_object.dead:                              # Without this, you could run around even though you're supposed to be...
-			schedule = Scheduler(player.protocol)                 # ...dead. This could be abused for cheats so we dont allow this. 
-			schedule.call_later(0.1, player.spawn_dead_after_ovl) # Need call_later cause otherwise you die as spectator which means you dont die at all. 
-		else:                                                     
-			player.fix_ori = player.protocol.world_time + 0.5
-			
-		player.send_chat('You are no longer using pubovl')
-		protocol.irc_say('* %s is no longer using pubovl' % player.name)
-		
-
-@command('externalovl', 'exovl', admin_only=True) # external~outside: "outside the game". Player is connected, but not joined to the game...
-def exovl(connection, ip):                        #                  yet. In this state, since he neither appears on scoreboard nor has...
-	protocol = connection.protocol                #                  spawned, he is completely invisible to everyone like he doesn't exist. 
-	ip_command = ip_address(str(ip))
-	for player in protocol.connections.values():
-		ip_player = ip_address(player.address[0])
-		if player.name is None and ip_player == ip_command:
-			x = 256 # spawn them in the middle of the map instead of the left upper corner. 
-			y = 256
-			z = 0
-			create_player = loaders.CreatePlayer()
-			create_player.player_id = player.player_id
-			create_player.name = "external Deuce" # server doesnt know your name yet- dont worry, when you really join you get your actual name back. 
-			create_player.x = x
-			create_player.y = y
-			create_player.z = z
-			create_player.weapon = 0
+		if player.hidden:
 			create_player.team = -1
+
 			player.send_contained(create_player)
-			player.send_chat("You are now using externalovl")
-			protocol.irc_say('*%s is using externalovl' % ip)
+			
+			client = player.client_string.lower()
+			if not "voxlap" in client: # fake deuce does not work in voxlap ;-;
+				player.spawn_deuce()
+				
+			player.send_chat("You are now using pubovl")
+			protocol.irc_say('* %s is using pubovl' % player.name) # let the rest of the staff know you are using this
+		else:
+			create_player.team = player.team.id
+
+			set_color = loaders.SetColor()
+			set_color.player_id = player.player_id
+			set_color.value = make_color(*player.color)
+			
+			player.send_contained(create_player, player)
+			
+			if player.deuce_spawned:
+				player.delete_deuce()
+			
+			if player.world_object.dead:                              # Without this, you could run around even though you're supposed to be...
+				schedule = Scheduler(player.protocol)                 # ...dead. This could be abused for cheats so we dont allow this. 
+				schedule.call_later(0.1, player.spawn_dead_after_ovl) # Need call_later cause otherwise you die as spectator which means you dont die at all. 
+			else:                                                     
+				player.fix_ori = player.protocol.world_time + 0.5
+				
+			player.send_chat('You are no longer using pubovl')
+			protocol.irc_say('* %s is no longer using pubovl' % player.name)
+		
+
+@command('externalovl', 'exovl')                  # external~outside: "outside the game". Player is connected, but not joined to the game...
+def exovl(connection, ip):                        #                  yet. In this state, since he neither appears on scoreboard nor has...
+	if is_staff(connection):                      #                  spawned, he is completely invisible to everyone like he doesn't exist. 
+		protocol = connection.protocol                
+		ip_command = ip_address(str(ip))
+		for player in protocol.connections.values():
+			ip_player = ip_address(player.address[0])
+			if player.name is None and ip_player == ip_command:
+				x = 256 # spawn them in the middle of the map instead of the left upper corner. 
+				y = 256
+				z = 0
+				create_player = loaders.CreatePlayer()
+				create_player.player_id = player.player_id
+				create_player.name = "external Deuce" # server doesnt know your name yet- dont worry, when you really join you get your actual name back. 
+				create_player.x = x
+				create_player.y = y
+				create_player.z = z
+				create_player.weapon = 0
+				create_player.team = -1
+				player.send_contained(create_player)
+				player.send_chat("You are now using externalovl")
+				protocol.irc_say('*%s is using externalovl' % ip)
 
 def apply_script(protocol, connection, config):
 	class PubovlProtocol(protocol):
