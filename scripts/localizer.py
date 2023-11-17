@@ -15,6 +15,7 @@ from piqueserver.commands import command, target_player
 import pygeoip
 
 DATABASE = pygeoip.GeoIP('./data/GeoLiteCity.dat')
+GEOIP_KEYS = ('country_name', 'city', 'region_name')
 FRENCH_COUNTRIES = ('fr', 'mq', 'gf', 'ht', 'ca', 'be', 'ch', 'tn')
 SPANISH_COUNTRIES = ('mx', 'es', 'gt', 'ar', 'bo', 'cl', 've', 'pe', 'py', 'uy', 'ec', 'sr', 'gy', 'co', 'dr',
                      'hn', 'ni', 'sv', 'cr', 'pa', 'do')
@@ -28,6 +29,19 @@ def native(connection, player):
         return f"We believe you speak {player.language}!"
     else:
         return f"We believe {player.name} speaks {player.language}!"
+
+@command('from', admin_only=True)
+@target_player
+def cmd_from(connection, player):
+    record = DATABASE.record_by_addr(player.address[0])
+    if record is None:
+        return 'Player location could not be determined.'
+
+    items = [record[entry] for entry in GEOIP_KEYS if entry in record]
+    items = [info for info in items if info is not None]
+    items = ', '.join(items)
+
+    return f'{player.name} is from {items}'
 
 def apply_script(protocol, connection, config):
     class LocalizeConnection(connection):
