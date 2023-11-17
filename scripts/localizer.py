@@ -11,7 +11,7 @@ Provides "connection.language" attribute based on geo IP.
 
 """
 
-from piqueserver.commands import command, get_player
+from piqueserver.commands import command, target_player
 import pygeoip
 
 DATABASE = pygeoip.GeoIP('./data/GeoLiteCity.dat')
@@ -21,19 +21,13 @@ SPANISH_COUNTRIES = ('mx', 'es', 'gt', 'ar', 'bo', 'cl', 've', 'pe', 'py', 'uy',
 PORTUGUESE_COUNTRIES = ('br', 'pt')
 ARAB_COUNTRIES = ('il', 'dz', 'ma', 'af', 'eg', 'bh', 'iq', 'sa', 'lb')
 
-
 @command()
-def native(connection, user=None):
-    protocol = connection.protocol
-    if user is not None:
-        connection = get_player(protocol, user)
-    if connection not in protocol.players.values():
-        raise ValueError()
-    if not user:    
-        return f"We believe you speak {connection.language}!"
+@target_player
+def native(connection, player):
+    if connection == player:
+        return f"We believe you speak {player.language}!"
     else:
-        return f"We believe {connection.name} speaks {connection.language}!"
-
+        return f"We believe {player.name} speaks {player.language}!"
 
 def apply_script(protocol, connection, config):
     class LocalizeConnection(connection):
