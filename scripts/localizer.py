@@ -11,7 +11,7 @@ Provides "connection.language" attribute based on geo IP.
 
 """
 
-from piqueserver.commands import command, target_player
+from piqueserver.commands import command, target_player, restrict
 import pygeoip
 
 DATABASE = pygeoip.GeoIP('./data/GeoLiteCity.dat')
@@ -30,7 +30,8 @@ def native(connection, player):
     else:
         return f"We believe {player.name} speaks {player.language}!"
 
-@command('from', admin_only=True)
+@restrict('guard')
+@command('from')
 @target_player
 def cmd_from(connection, player):
     record = DATABASE.record_by_addr(player.address[0])
