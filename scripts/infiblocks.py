@@ -25,7 +25,6 @@ def send_player_property_packet(self):
     ammo_clip = self.weapon_object.current_ammo                           
     ammo_reserved = self.weapon_object.current_stock                      
     score = self.kills                                                    
-    subID = 0
                                                                             
     # Corrected packet structure with all 10 items                        
     packet_data = struct.pack(                                            
