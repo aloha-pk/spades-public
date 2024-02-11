@@ -6,8 +6,6 @@
 from pyspades.contained import WeaponReload, SetTool, PlayerPropertiesV1
 from piqueserver.commands import command
 from pyspades.constants import FALL_KILL, GRENADE_TOOL
-import enet
-import struct
 set_tool = SetTool()
 
 COMMAND_IS_LOUD = False
