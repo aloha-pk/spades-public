@@ -3,7 +3,7 @@
 # This file is a redistribution by the aloha.pk organization. More information: https://aloha.pk/pub/github-org
 
 
-from pyspades.contained import WeaponReload, SetTool
+from pyspades.contained import WeaponReload, SetTool, PlayerPropertiesV1
 from piqueserver.commands import command
 from pyspades.constants import FALL_KILL, GRENADE_TOOL
 import enet
@@ -12,34 +12,6 @@ set_tool = SetTool()
 
 COMMAND_IS_LOUD = False
 INFINITE_BLOCKS = True
-
-
-def send_player_property_packet(self):     
-    PACKET_EXT_BASE = 64  # 0x40                                          
-    EXT_PLAYER_PROPERTIES = 0  # 0x00                                     
-                                                                            
-    player_id = self.player_id                                            
-    health = self.hp                                                      
-    blocks = self.blocks = 50                                                           
-    grenades = self.grenades                                              
-    ammo_clip = self.weapon_object.current_ammo                           
-    ammo_reserved = self.weapon_object.current_stock                      
-    score = self.kills                                                    
-                                                                            
-    # Corrected packet structure with all 10 items                        
-    packet_data = struct.pack(                                            
-        '>B B B B B B B H I',  # Format: Packet ID, subID, player_id, health, blocks, grenades, ammo_clip, ammo_reserved (H), score (I)                           
-        PACKET_EXT_BASE, # Packet ID 
-        EXT_PLAYER_PROPERTIES,  # sub ID                                                        
-        player_id,                                                        
-        health,                                                           
-        blocks,                                                           
-        grenades,                                                         
-        ammo_clip,                                                        
-        ammo_reserved,                                                    
-        score                                                             
-    )                                                                     
-    self.peer.send(0, enet.Packet(packet_data, enet.PACKET_FLAG_RELIABLE))
 
 @command("iblox", admin_only=True)
 def infiniteblocks(connection):
@@ -59,11 +31,20 @@ def infiniteblocks(connection):
 
 def apply_script(protocol, connection, config):
     class InfiBlocksConnection(connection):
-
         def infiblocks_refill(self):
-            if 0 in self.proto_extensions:
-                send_player_property_packet(self)
+            if PlayerPropertiesV1.ext_id in self.proto_extensions and \
+               self.proto_extensions[PlayerPropertiesV1.ext_id] == PlayerPropertiesV1.ext_version:
+                properties = PlayerPropertiesV1()
+                properties.player_id = self.player_id
+                properties.health = self.hp
+                properties.blocks = self.blocks = 50
+                properties.grenades = self.grenades
+                properties.ammo_clip = self.weapon_object.current_ammo
+                properties.ammo_reserved = self.weapon_object.current_stock
+                properties.score = self.kills
+                self.send_contained(properties)
                 return
+
             health = self.hp
             weapon = self.weapon_object
             ammo = weapon.current_ammo
