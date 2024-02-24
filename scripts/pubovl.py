@@ -273,10 +273,6 @@ def apply_script(protocol, connection, config):
 			if not spectator:
 				self.on_spawn((x, y, z))
 
-			if not self.client_info:
-				handshake_init = loaders.HandShakeInit()
-				self.send_contained(handshake_init)
-				
 			if self.player_id == self.protocol.deuce_id:
 				if self.deuce_spawned:
 					for players in self.protocol.players.values():
