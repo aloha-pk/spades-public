@@ -70,7 +70,7 @@ task.LoopingCall(flagthink).start(0.1)
 
 def apply_script(protocol, connection, config):
 	class FlagFleeProtocol(protocol):
-		flagflee = False
+		flagflee = True
 		
 		def ffsetup(self):
 			global protocol
