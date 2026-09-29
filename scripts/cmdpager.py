@@ -7,8 +7,8 @@ def apply_script(proto, con, config):
 	return proto, con;
 end
 
-def print_cmd(con, x):
-	desc, usage, _ = get_command_help(x);
+def fmt_cmd(cmd):
+	desc, usage, _ = get_command_help(cmd);
 
 	if (len(usage) != 0 and usage[0] != "/"):
 		usage = "";
@@ -16,17 +16,16 @@ def print_cmd(con, x):
 
 	if (desc != ""):
 		if (usage != ""):
-			con.send_chat(usage + " -- " + desc + "\n");
-		else:
-			con.send_chat("/" + x.command_name + " -- " + desc + "\n");
-		end
-	else:
-		if (usage != ""):
-			con.send_chat(usage + "\n");
-		else:
-			con.send_chat("/" + x.command_name + "\n");
-		end
+			return usage + " -- " + desc + "\n";
+
+		return "/" + cmd.command_name + " -- " + desc + "\n";
 	end
+
+	if (usage != ""):
+		return usage + "\n";
+	end
+
+	return "/" + cmd.command_name + "\n";
 end
 
 # TODO: this line length is a pile of crap. . .
@@ -61,10 +60,11 @@ def commands(con, pagearg=None):
 	end
 
 	for x in cmds[pagestart:pageend]:
-		print_cmd(con, x);
+		con.send_chat(fmt_cmd(x));
 	end
 end
 
+@command("apropos")
 def apropos(con, *strarg):
 	"""
 	Filter through the list of commands.
@@ -73,11 +73,13 @@ def apropos(con, *strarg):
 
 	strful = " ".join(strarg);
 
-	# TODO: aliases. . .
-	cmds = [x for x in _commands.values() if has_permission(x, con) and strful in x.command_name];
+	cmds = [x for x in _commands.values() if has_permission(x, con)];
 	cmds.sort(key=lambda x: x.command_name);
 
 	for x in cmds:
-		print_cmd(con, x);
+		line = fmt_cmd(x);
+		if (strful in line):
+			con.send_chat(line);
+		end
 	end
 end
